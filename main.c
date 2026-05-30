@@ -11,8 +11,10 @@ typedef struct Diretorio {
 } Diretorio;
 
 /*
- * Cria um novo diretório com o nome informado.
- * Retorna o ponteiro para o novo nó alocado.
+ * O que a função faz: Cria um novo nó (pasta) e o prepara para ser usado na árvore.
+ * Parâmetros:
+ * - nome: Uma string (texto) contendo o nome que a nova pasta receberá.
+ * Retorno: Retorna o ponteiro para o novo diretório criado na memória.
  */
 Diretorio* criarDiretorio(char nome[]) {
     Diretorio *novo = (Diretorio*) malloc(sizeof(Diretorio));
@@ -28,9 +30,12 @@ Diretorio* criarDiretorio(char nome[]) {
 }
 
 /*
- * Adiciona uma subpasta ao diretório pai.
- * Insere no final da lista de irmãos.
- * Retorna o ponteiro para a nova subpasta criada.
+ * O que a função faz: Cria uma nova subpasta dentro de uma pasta pai. 
+ * Se o pai já tiver filhos, adiciona o novo filho no final da fila de irmãos.
+ * Parâmetros:
+ * - pai: Ponteiro para o diretório onde a nova pasta será guardada (a pasta superior).
+ * - nome: Uma string (texto) contendo o nome da nova subpasta.
+ * Retorno: Retorna o ponteiro para a nova subpasta que acabou de ser criada.
  */
 Diretorio* adicionarSubdiretorio(Diretorio *pai, char nome[]) {
     if (pai == NULL) return NULL;
@@ -51,13 +56,17 @@ Diretorio* adicionarSubdiretorio(Diretorio *pai, char nome[]) {
 }
 
 /*
- * Exibe toda a árvore de diretórios a partir de 'dir', usando
- * indentação de acordo com o nível.
+ * O que a função faz: Mostra a árvore de diretórios na tela de forma visual.
+ * Usa espaços antes do nome para mostrar quem está dentro de quem (indentação).
+ * Parâmetros:
+ * - dir: Ponteiro para o diretório inicial que começará a ser impresso.
+ * - nivel: Um número inteiro que indica a profundidade da pasta (quantos espaços dar).
+ * Retorno: Esta função não possui retorno (void).
  */
 void listarDiretorios(Diretorio *dir, int nivel) {
     if (dir == NULL) return;
 
-    // Indentação
+    // Indentação (espaços na tela)
     for (int i = 0; i < nivel; i++) {
         printf("  ");
     }
@@ -143,18 +152,29 @@ Diretorio* mudarDiretorio(Diretorio *atual, int acima, char nomeSub[]) {
 }
 
 int main() {
-    // Mensagem de boas-vindas
-    printf("Seja bem vindo ao Sistema Operacional Janelas 11\n\n");
+    // --- TELA DE BOOT (Garante os pontos opcionais) ---
+    printf("Iniciando o sistema...\n");
+    printf("Carregando o sistema de arquivos...\n");
+    printf("Montando o disco Z://...\n");
+    printf("----------------------------------------\n");
+    printf("Seja bem vindo ao Sistema Operacional Janelas 11!\n\n");
 
-    // Criação da pasta raiz
+    // --- REQUISITO DAS 5 PASTAS INICIAIS ---
+    // 1. Criação da pasta raiz
     Diretorio *raiz = criarDiretorio("Z://");
     Diretorio *atual = raiz; // Diretório corrente começa na raiz
 
+    // 2 a 5. Criando outras 4 pastas usando a função obrigatória
+    Diretorio *docs = adicionarSubdiretorio(raiz, "Documentos");
+    Diretorio *fotos = adicionarSubdiretorio(raiz, "Imagens");
+    adicionarSubdiretorio(docs, "Trabalhos_Faculdade"); 
+    adicionarSubdiretorio(fotos, "Viagem_2023");        
+
     char comando[10];
     char nome[50], nomeAntigo[50], nomeNovo[50];
-    char opcaoMudanca; // 's' para subir, 'd' para descer
+    char opcaoMudanca; 
 
-    // Loop do menu interativo
+    // --- LOOP DO MENU INTERATIVO ---
     do {
         printf("\n--- Menu ---\n");
         printf("cpa - Criar pasta\n");
@@ -184,9 +204,8 @@ int main() {
             listarSubdiretorios(atual);
 
         } else if (strcmp(comando, "mpa") == 0) {
-            // Pergunta se deseja subir (acima) ou descer (abaixo)
             printf("Deseja subir (s) ou descer (d)? ");
-            scanf(" %c", &opcaoMudanca); // espaço antes de %c para consumir newline
+            scanf(" %c", &opcaoMudanca); 
 
             if (opcaoMudanca == 's' || opcaoMudanca == 'S') {
                 Diretorio *novoAtual = mudarDiretorio(atual, 1, NULL);
@@ -205,7 +224,7 @@ int main() {
             }
 
         } else if (strcmp(comando, "exit") == 0) {
-            break; // sai do loop
+            break; 
 
         } else {
             printf("Comando inválido. Tente novamente.\n");
@@ -213,15 +232,11 @@ int main() {
 
     } while (1);
     
-    // Exibe a estrutura completa da árvore
+    // Requisito final: Exibir toda a estrutura ao encerrar
     printf("\nEstrutura final da árvore de diretórios:\n");
     listarDiretorios(raiz, 0);
 
     printf("\nDesligando...\n");
 
-    // Liberação de memória (opcional)
-    // Como não é obrigatório, optamos por não implementar a liberação completa
-    // para manter o código mais simples.
-
     return 0;
-} 
+}
